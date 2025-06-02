@@ -50,74 +50,29 @@ if 'stock_symbols' not in st.session_state:
 if 'watchlist' not in st.session_state:
     st.session_state.watchlist = []
 
-# Apply saved theme and music
+# Apply dark theme by default
 import streamlit.components.v1 as components
 components.html("""
 <script>
-// Apply saved theme on page load
-const savedTheme = localStorage.getItem('user_theme');
-if (savedTheme) {
-    document.body.className = document.body.className.replace(/theme-\\w+/g, '');
-    
-    if (savedTheme === 'dark') {
-        document.body.classList.add('theme-dark');
-        document.body.style.backgroundColor = '#0E1117';
-        document.body.style.color = '#FAFAFA';
-    } else if (savedTheme === 'dark-green') {
-        document.body.classList.add('theme-dark-green');
-        document.body.style.backgroundColor = '#0F2027';
-        document.body.style.backgroundImage = 'linear-gradient(135deg, #0F2027, #203A43, #2C5364)';
-        document.body.style.color = '#FAFAFA';
-    } else if (savedTheme === 'professional-blue') {
-        document.body.classList.add('theme-professional-blue');
-        document.body.style.backgroundColor = '#1e3a8a';
-        document.body.style.backgroundImage = 'linear-gradient(135deg, #1e3a8a, #3b82f6)';
-        document.body.style.color = 'white';
-    }
-}
+// Apply dark theme by default
+document.body.style.backgroundColor = '#0f172a';
+document.body.style.color = '#f8fafc';
 
-// Initialize background music if enabled
-const musicEnabled = localStorage.getItem('music_enabled');
-const musicVolume = localStorage.getItem('music_volume') || '30';
-
-if (musicEnabled === 'true' && !document.getElementById('background-music')) {
-    // Create a pleasant ambient soundscape instead of buzzing
-    try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator1 = audioContext.createOscillator();
-        const oscillator2 = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        const filterNode = audioContext.createBiquadFilter();
-        
-        // Create pleasant harmonic tones
-        oscillator1.frequency.setValueAtTime(220, audioContext.currentTime); // A3
-        oscillator2.frequency.setValueAtTime(330, audioContext.currentTime); // E4
-        
-        oscillator1.type = 'sine';
-        oscillator2.type = 'triangle';
-        
-        // Connect with filter for warmth
-        oscillator1.connect(filterNode);
-        oscillator2.connect(filterNode);
-        filterNode.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        // Configure low-pass filter
-        filterNode.type = 'lowpass';
-        filterNode.frequency.setValueAtTime(1000, audioContext.currentTime);
-        
-        // Very subtle volume
-        gainNode.gain.setValueAtTime(parseInt(musicVolume) / 10000, audioContext.currentTime);
-        
-        oscillator1.start();
-        oscillator2.start();
-        
-        // Store reference for cleanup
-        window.backgroundOscillator = { oscillator1, oscillator2, gainNode, audioContext, filterNode };
-    } catch (e) {
-        console.log('Audio context not available:', e);
+// Apply dark theme to Streamlit elements
+const style = document.createElement('style');
+style.textContent = `
+    .stApp {
+        background-color: #0f172a !important;
+        color: #f8fafc !important;
     }
-}
+    .stSidebar {
+        background-color: #1e293b !important;
+    }
+    .stSelectbox label, .stTextInput label, .stDateInput label {
+        color: #f8fafc !important;
+    }
+`;
+document.head.appendChild(style);
 </script>
 """, height=0)
 
@@ -295,57 +250,7 @@ try:
 except Exception as e:
     st.error(f"Error loading market activity: {str(e)}")
 
-# Professional Settings Panel
-st.sidebar.markdown("## ⚙️ Settings")
-
-# Theme Selection
-theme_options = {
-    "Light": "light",
-    "Dark": "dark", 
-    "Dark Green": "dark-green",
-    "Custom Background": "custom"
-}
-
-selected_theme = st.sidebar.selectbox(
-    "Theme",
-    options=list(theme_options.keys()),
-    index=0,
-    key="theme_selector"
-)
-
-# Visual Effects
-st.sidebar.markdown("### Visual Effects")
-grid_effect = st.sidebar.toggle("Grid Background", value=True)
-mouse_glow = st.sidebar.toggle("Mouse Glow Effect", value=True)
-animations = st.sidebar.toggle("Animations", value=True)
-
-# Custom Background Upload
-if selected_theme == "Custom Background":
-    uploaded_bg = st.sidebar.file_uploader(
-        "Upload Background Image",
-        type=['png', 'jpg', 'jpeg'],
-        help="Upload your custom background image"
-    )
-    if uploaded_bg:
-        st.sidebar.success("Background uploaded successfully!")
-
-# Apply theme changes with JavaScript
-if st.sidebar.button("Apply Theme"):
-    theme_value = theme_options[selected_theme]
-    components.html(f"""
-    <script>
-    if (window.updateTheme) {{
-        window.updateTheme('{theme_value}');
-    }}
-    if (window.toggleGridEffect) {{
-        window.toggleGridEffect({str(grid_effect).lower()});
-    }}
-    if (window.toggleMouseGlow) {{
-        window.toggleMouseGlow({str(mouse_glow).lower()});
-    }}
-    </script>
-    """, height=0)
-    st.sidebar.success("Theme applied!")
+# Removed theme settings - dark theme is permanent
 
 # Navigation info
 st.sidebar.markdown("## 🚀 Navigation")

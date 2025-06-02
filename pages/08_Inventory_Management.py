@@ -416,7 +416,7 @@ def main():
                         if existing_sku > 0:
                             st.error(f"SKU '{sku}' already exists. Please use a unique SKU.")
                         else:
-                        try:
+                            try:
                             product_data = {
                                 'sku': sku,
                                 'name': name,

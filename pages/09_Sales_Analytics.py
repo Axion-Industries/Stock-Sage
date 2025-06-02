@@ -344,9 +344,10 @@ def main():
                     customers_df.at[index, 'total_spent'] = total_spent
 
             # Create proper labels for the pie chart
-            customers_df['customer_label'] = customers_df.apply(
-                lambda x: f"{x.get('name', x.get('customer_name', 'Customer ' + str(x['id'])))}", axis=1
-            )
+            if not customers_df.empty:
+                customers_df['customer_label'] = customers_df.apply(
+                    lambda x: f"{x.get('name', x.get('customer_name', 'Customer ' + str(x.name if hasattr(x, 'name') else x.iloc[0] if len(x) > 0 else 'Unknown')))}", axis=1
+                )
 
             fig = px.pie(
                 customers_df, 
