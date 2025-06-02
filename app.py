@@ -32,19 +32,31 @@ load_custom_assets()
 # Initialize authentication
 init_auth()
 
-# Initialize session state
+# Check authentication
+if not st.session_state.authenticated:
+    login_page()
+    st.stop()
+
+# Initialize session state for authenticated users
 if 'data_fetcher' not in st.session_state:
     st.session_state.data_fetcher = DataFetcher()
 
 if 'portfolio_manager' not in st.session_state:
     st.session_state.portfolio_manager = PortfolioManager()
 
+if 'stock_symbols' not in st.session_state:
+    st.session_state.stock_symbols = StockSymbolFetcher()
+
 if 'watchlist' not in st.session_state:
     st.session_state.watchlist = []
 
 # Main page content
-st.title("📈 Stock Market Dashboard")
-st.markdown("Welcome to your comprehensive stock market analysis platform")
+user = get_current_user()
+st.title("📈 Professional Stock Market Dashboard")
+if user:
+    st.markdown(f"Welcome back, **{user['username']}**! Your comprehensive stock market analysis platform")
+else:
+    st.markdown("Welcome to your comprehensive stock market analysis platform")
 
 # Quick stats section
 col1, col2, col3, col4 = st.columns(4)
@@ -212,18 +224,78 @@ try:
 except Exception as e:
     st.error(f"Error loading market activity: {str(e)}")
 
+# Professional Settings Panel
+st.sidebar.markdown("## ⚙️ Settings")
+
+# Theme Selection
+theme_options = {
+    "Light": "light",
+    "Dark": "dark", 
+    "Dark Green": "dark-green",
+    "Custom Background": "custom"
+}
+
+selected_theme = st.sidebar.selectbox(
+    "Theme",
+    options=list(theme_options.keys()),
+    index=0,
+    key="theme_selector"
+)
+
+# Visual Effects
+st.sidebar.markdown("### Visual Effects")
+grid_effect = st.sidebar.toggle("Grid Background", value=True)
+mouse_glow = st.sidebar.toggle("Mouse Glow Effect", value=True)
+animations = st.sidebar.toggle("Animations", value=True)
+
+# Custom Background Upload
+if selected_theme == "Custom Background":
+    uploaded_bg = st.sidebar.file_uploader(
+        "Upload Background Image",
+        type=['png', 'jpg', 'jpeg'],
+        help="Upload your custom background image"
+    )
+    if uploaded_bg:
+        st.sidebar.success("Background uploaded successfully!")
+
+# Apply theme changes with JavaScript
+if st.sidebar.button("Apply Theme"):
+    theme_value = theme_options[selected_theme]
+    components.html(f"""
+    <script>
+    if (window.updateTheme) {{
+        window.updateTheme('{theme_value}');
+    }}
+    if (window.toggleGridEffect) {{
+        window.toggleGridEffect({str(grid_effect).lower()});
+    }}
+    if (window.toggleMouseGlow) {{
+        window.toggleMouseGlow({str(mouse_glow).lower()});
+    }}
+    </script>
+    """, height=0)
+    st.sidebar.success("Theme applied!")
+
 # Navigation info
-st.sidebar.markdown("## Navigation")
+st.sidebar.markdown("## 🚀 Navigation")
 st.sidebar.markdown("""
-- **Market Overview**: View major indices and market trends
-- **Stock Search**: Search and analyze individual stocks
+- **Main**: Dashboard overview and market data
+- **Market Overview**: Major indices and sector performance
+- **Stock Search**: Search and analyze individual stocks  
 - **Portfolio**: Track your holdings and performance
 - **Watchlist**: Monitor stocks of interest
 - **Technical Analysis**: Advanced charting and indicators
 """)
 
+# User Account
+st.sidebar.markdown("## 👤 Account")
+if user:
+    st.sidebar.write(f"**User:** {user['username']}")
+    if st.sidebar.button("Logout", type="secondary"):
+        logout()
+
 # Auto-refresh option
-if st.sidebar.checkbox("Auto-refresh (every 5 minutes)"):
+if st.sidebar.toggle("Auto-refresh (5 min)"):
     import time
-    time.sleep(300)  # 5 minutes
+    time.sleep(300)
     st.rerun()

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Stock Market Dashboard</title>
+    <meta name="description" content="Advanced real-time stock market analysis platform with portfolio tracking, technical analysis, and professional-grade features.">
+    <meta name="keywords" content="stocks, trading, portfolio, market analysis, technical analysis, real-time data">
+    <link rel="icon" type="image/png" href="static/favicon.png">
+    
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="Professional Stock Market Dashboard">
+    <meta property="og:description" content="Advanced real-time stock market analysis platform">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourapp.render.com">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="static/css/style.css">
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .landing-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #64748b;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature {
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-container">
+        <div class="logo">📈</div>
+        <h1>Professional Stock Market Dashboard</h1>
+        <p class="subtitle">
+            Advanced real-time market analysis with professional-grade features, 
+            portfolio tracking, and comprehensive technical analysis tools.
+        </p>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <h3>Real-Time Data</h3>
+                <p>Live market data from thousands of stocks worldwide</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💼</div>
+                <h3>Portfolio Tracking</h3>
+                <p>Professional portfolio management and performance analytics</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📈</div>
+                <h3>Technical Analysis</h3>
+                <p>Advanced charting with 20+ technical indicators</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">👁️</div>
+                <h3>Smart Watchlists</h3>
+                <p>Monitor stocks with customizable price alerts</p>
+            </div>
+        </div>
+        
+        <a href="/app" class="cta-button">Launch Dashboard</a>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number">60K+</div>
+                <div class="stat-label">Global Stocks</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">Real-Time</div>
+                <div class="stat-label">Market Data</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">20+</div>
+                <div class="stat-label">Indicators</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Add some interactive effects
+        document.addEventListener('mousemove', (e) => {
+            const container = document.querySelector('.landing-container');
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = (y - centerY) / 20;
+            const rotateY = (centerX - x) / 20;
+            
+            container.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+        
+        document.addEventListener('mouseleave', () => {
+            const container = document.querySelector('.landing-container');
+            container.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+        });
+    </script>
+</body>
+</html>
