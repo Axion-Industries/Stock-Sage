@@ -6,21 +6,34 @@ def init_auth():
     if 'db' not in st.session_state:
         st.session_state.db = DatabaseManager()
     
-    # Check for saved login in browser
+    # Check for saved login in browser localStorage
     if 'user' not in st.session_state:
-        saved_user = st.query_params.get('saved_session')
-        if saved_user:
-            try:
-                import json
-                user_data = json.loads(saved_user)
-                st.session_state.user = user_data
-                st.session_state.authenticated = True
-            except:
-                st.session_state.user = None
-                st.session_state.authenticated = False
-        else:
-            st.session_state.user = None
-            st.session_state.authenticated = False
+        # Add JavaScript to check localStorage
+        import streamlit.components.v1 as components
+        
+        # Check localStorage for saved session
+        check_session_script = """
+        <script>
+        const savedSession = localStorage.getItem('stock_dashboard_session');
+        if (savedSession) {
+            const sessionData = JSON.parse(savedSession);
+            // Send session data back to Streamlit
+            window.parent.postMessage({
+                type: 'saved_session',
+                data: sessionData
+            }, '*');
+        } else {
+            window.parent.postMessage({
+                type: 'no_session'
+            }, '*');
+        }
+        </script>
+        """
+        components.html(check_session_script, height=0)
+        
+        # Initialize session state
+        st.session_state.user = None
+        st.session_state.authenticated = False
 
 def login_page():
     """Display login/register page"""
@@ -48,10 +61,16 @@ def login_page():
                             'User logged in successfully'
                         )
                         
-                        # Save login to browser storage
+                        # Save login to browser localStorage
+                        import streamlit.components.v1 as components
                         import json
                         user_json = json.dumps(user)
-                        st.query_params['saved_session'] = user_json
+                        save_session_script = f"""
+                        <script>
+                        localStorage.setItem('stock_dashboard_session', '{user_json}');
+                        </script>
+                        """
+                        components.html(save_session_script, height=0)
                         
                         st.success("Login successful!")
                         st.rerun()
@@ -94,6 +113,15 @@ def logout():
             'User logged out'
         )
     
+    # Clear localStorage
+    import streamlit.components.v1 as components
+    clear_session_script = """
+    <script>
+    localStorage.removeItem('stock_dashboard_session');
+    </script>
+    """
+    components.html(clear_session_script, height=0)
+    
     st.session_state.user = None
     st.session_state.authenticated = False
     st.rerun()
@@ -106,6 +134,26 @@ def require_auth(func):
             return None
         return func(*args, **kwargs)
     return wrapper
+
+def restore_session_from_storage(user_data):
+    """Restore session from localStorage data"""
+    try:
+        if user_data and isinstance(user_data, dict):
+            # Verify user still exists in database
+            db = st.session_state.db
+            with db.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM users WHERE id = ? AND is_active = 1", (user_data['id'],))
+                current_user = cursor.fetchone()
+                
+                if current_user:
+                    st.session_state.user = dict(current_user)
+                    st.session_state.authenticated = True
+                    return True
+    except Exception as e:
+        pass
+    
+    return False
 
 def get_current_user():
     """Get current authenticated user"""

@@ -306,22 +306,25 @@ def main():
             cursor = conn.cursor()
             
             # Total members
-            cursor.execute("SELECT COUNT(*) as count FROM company_members WHERE company_id = ? AND is_active = 1", (company_id,))
-            total_members = cursor.fetchone()['count']
+            try:
+                cursor.execute("SELECT COUNT(*) as count FROM company_members WHERE company_id = ? AND is_active = 1", (company_id,))
+                total_members = cursor.fetchone()['count']
+            except:
+                total_members = 0
             
             # Total products (if inventory exists)
-            cursor.execute("SELECT COUNT(*) as count FROM products WHERE id IN (SELECT id FROM products LIMIT 1)")
             try:
+                cursor.execute("SELECT COUNT(*) as count FROM products")
                 total_products = cursor.fetchone()['count']
             except:
                 total_products = 0
             
             # Total transactions today
-            cursor.execute("""
-                SELECT COUNT(*) as count FROM sales_transactions 
-                WHERE DATE(sale_date) = DATE('now')
-            """)
             try:
+                cursor.execute("""
+                    SELECT COUNT(*) as count FROM sales_transactions 
+                    WHERE DATE(sale_date) = DATE('now')
+                """)
                 transactions_today = cursor.fetchone()['count']
             except:
                 transactions_today = 0

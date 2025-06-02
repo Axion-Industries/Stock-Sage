@@ -32,6 +32,33 @@ load_custom_assets()
 # Initialize authentication
 init_auth()
 
+# Check for session restoration from localStorage via JavaScript
+import streamlit.components.v1 as components
+
+if not st.session_state.authenticated:
+    # Try to restore session from localStorage
+    session_check_html = """
+    <script>
+    // Check if we have a saved session
+    const savedSession = localStorage.getItem('stock_dashboard_session');
+    if (savedSession) {
+        try {
+            const sessionData = JSON.parse(savedSession);
+            // Send to parent window
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'restore_session',
+                    sessionData: sessionData
+                }, '*');
+            }
+        } catch (e) {
+            localStorage.removeItem('stock_dashboard_session');
+        }
+    }
+    </script>
+    """
+    components.html(session_check_html, height=0)
+
 # Check authentication
 if not st.session_state.authenticated:
     login_page()
