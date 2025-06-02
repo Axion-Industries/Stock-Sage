@@ -330,7 +330,14 @@ def main():
                 customers_df['total_spent'] = 0  # Initialize total_spent column
                 for index, customer in customers_df.iterrows():
                     cursor = conn.cursor()
-                    cursor.execute("SELECT SUM(total_amount) FROM sales_transactions WHERE customer_id = ?", (customer['id'],))
+                    try:
+                    customer_id = customer.get('id') if isinstance(customer, dict) else customer[0] if hasattr(customer, '__getitem__') else None
+                    if customer_id:
+                        cursor.execute("SELECT SUM(total_amount) FROM sales_transactions WHERE customer_id = ?", (customer_id,))
+                    else:
+                        cursor.execute("SELECT 0")
+                except (KeyError, IndexError, TypeError):
+                    cursor.execute("SELECT 0")
                     total_spent = cursor.fetchone()[0] or 0
                     customers_df.at[index, 'total_spent'] = total_spent
 

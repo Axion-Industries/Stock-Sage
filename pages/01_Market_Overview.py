@@ -48,18 +48,20 @@ if indices_data:
         if 'data' in data and not data['data'].empty:
             hist_data = data['data']
             # Normalize to percentage change from open
-            open_price = hist_data['Open'].iloc[0]
-            pct_change = ((hist_data['Close'] - open_price) / open_price) * 100
-            
-            fig.add_trace(
-                go.Scatter(
-                    x=hist_data.index,
-                    y=pct_change,
-                    mode='lines',
-                    name=name,
-                    line=dict(width=2)
-                )
-            )
+            if len(hist_data) > 0:
+                open_price = hist_data['Open'].iloc[0]
+                if open_price > 0:  # Avoid division by zero
+                    pct_change = ((hist_data['Close'] - open_price) / open_price) * 100
+                    
+                    fig.add_trace(
+                        go.Scatter(
+                            x=hist_data.index,
+                            y=pct_change,
+                            mode='lines',
+                            name=name,
+                            line=dict(width=2)
+                        )
+                    )
     
     fig.update_layout(
         title="Intraday Performance (% Change from Open)",

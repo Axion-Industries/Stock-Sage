@@ -200,7 +200,7 @@ class DataFetcher:
         
         return matches[:20]  # Return top 20 matches
     
-    @st.cache_data(ttl=3600)  # Cache for 1 hour
+    @st.cache_data(ttl=300)  # Cache for 5 minutes
     def get_market_indices(_self):
         """
         Get major market indices data
@@ -220,12 +220,23 @@ class DataFetcher:
         for name, symbol in indices.items():
             try:
                 ticker = yf.Ticker(symbol)
-                data = ticker.history(period="1d")
-                if not data.empty:
+                # Get 1 day data with 5-minute intervals for intraday chart
+                data = ticker.history(period="1d", interval="5m")
+                
+                # Also get basic info
+                info = ticker.info
+                current_price = info.get('regularMarketPrice', 0)
+                previous_close = info.get('previousClose', 0)
+                
+                if current_price == 0 and not data.empty:
                     current_price = data['Close'].iloc[-1]
-                    open_price = data['Open'].iloc[-1]
-                    change = current_price - open_price
-                    pct_change = (change / open_price) * 100
+                
+                if previous_close == 0 and not data.empty and len(data) > 1:
+                    previous_close = data['Close'].iloc[0]
+                
+                if current_price > 0 and previous_close > 0:
+                    change = current_price - previous_close
+                    pct_change = (change / previous_close) * 100
                     
                     indices_data[name] = {
                         'symbol': symbol,
@@ -235,7 +246,25 @@ class DataFetcher:
                         'data': data
                     }
             except Exception as e:
-                continue
+                # Fallback to simple daily data
+                try:
+                    ticker = yf.Ticker(symbol)
+                    simple_data = ticker.history(period="2d")
+                    if len(simple_data) >= 2:
+                        current_price = simple_data['Close'].iloc[-1]
+                        previous_close = simple_data['Close'].iloc[-2]
+                        change = current_price - previous_close
+                        pct_change = (change / previous_close) * 100
+                        
+                        indices_data[name] = {
+                            'symbol': symbol,
+                            'price': current_price,
+                            'change': change,
+                            'percent_change': pct_change,
+                            'data': simple_data
+                        }
+                except:
+                    continue
         
         return indices_data
     
