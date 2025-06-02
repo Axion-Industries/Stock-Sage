@@ -5,14 +5,32 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 from utils.data_fetcher import DataFetcher
 from utils.portfolio_manager import PortfolioManager
+from utils.stock_symbols import StockSymbolFetcher
+from auth import init_auth, login_page, get_current_user, logout
+import streamlit.components.v1 as components
 
 # Configure page
 st.set_page_config(
-    page_title="Stock Market Dashboard",
+    page_title="Professional Stock Market Dashboard",
     page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Load custom CSS and JavaScript
+def load_custom_assets():
+    with open('static/css/style.css', 'r') as f:
+        css = f.read()
+    st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
+    
+    with open('static/js/effects.js', 'r') as f:
+        js = f.read()
+    components.html(f'<script>{js}</script>', height=0)
+
+load_custom_assets()
+
+# Initialize authentication
+init_auth()
 
 # Initialize session state
 if 'data_fetcher' not in st.session_state:

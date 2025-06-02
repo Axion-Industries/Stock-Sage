@@ -1,0 +1,206 @@
+/* Professional Stock Market Dashboard Styles */
+
+:root {
+    --primary-color: #1e3a8a;
+    --secondary-color: #3b82f6;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --dark-bg: #0f172a;
+    --light-bg: #f8fafc;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --grid-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Remove cursor from all buttons and clickable elements */
+.stButton > button,
+.stSelectbox > div,
+.stCheckbox > label,
+.stRadio > div,
+.stTabs [data-baseweb="tab"],
+.stDownloadButton > button,
+.element-container button,
+div[data-testid="stButton"] button,
+div[data-testid="stDownloadButton"] button,
+.stActionButton > button {
+    cursor: pointer !important;
+    user-select: none !important;
+}
+
+.stButton > button:hover,
+.stDownloadButton > button:hover,
+.element-container button:hover,
+div[data-testid="stButton"] button:hover,
+div[data-testid="stDownloadButton"] button:hover {
+    cursor: pointer !important;
+    text-decoration: none !important;
+}
+
+/* Remove text selection cursor from labels and text */
+.stSelectbox label,
+.stCheckbox label,
+.stRadio label,
+.stButton > button span,
+.stDownloadButton > button span,
+h1, h2, h3, h4, h5, h6,
+.metric-label,
+.metric-value {
+    cursor: default !important;
+    user-select: none !important;
+}
+
+/* Professional button styling */
+.stButton > button {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Grid background animation */
+.grid-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.3;
+    background-image: 
+        linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+/* Mouse glow effect */
+.mouse-glow {
+    position: fixed;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+}
+
+/* Theme backgrounds */
+.theme-dark {
+    background-color: var(--dark-bg);
+    color: white;
+}
+
+.theme-dark-green {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5530);
+    color: #a7f3d0;
+}
+
+.theme-custom {
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* Professional sidebar */
+.css-1d391kg {
+    background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+}
+
+/* Metric cards */
+.metric-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid var(--primary-color);
+    transition: transform 0.3s ease;
+}
+
+.metric-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Animation keyframes */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Apply animations */
+.animate-fade-in {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+.animate-pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Hide Streamlit branding */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+
+/* Professional loading spinner */
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
