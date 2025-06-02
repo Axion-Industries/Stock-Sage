@@ -50,7 +50,7 @@ if 'stock_symbols' not in st.session_state:
 if 'watchlist' not in st.session_state:
     st.session_state.watchlist = []
 
-# Apply saved theme
+# Apply saved theme and music
 import streamlit.components.v1 as components
 components.html("""
 <script>
@@ -75,12 +75,40 @@ if (savedTheme) {
         document.body.style.color = 'white';
     }
 }
+
+// Initialize background music if enabled
+const musicEnabled = localStorage.getItem('music_enabled');
+const musicVolume = localStorage.getItem('music_volume') || '30';
+
+if (musicEnabled === 'true' && !document.getElementById('background-music')) {
+    // Create a subtle ambient background sound for demo
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // Create a very subtle low-frequency ambient tone
+        oscillator.frequency.setValueAtTime(55, audioContext.currentTime); // Low A note
+        oscillator.type = 'sine';
+        gainNode.gain.setValueAtTime(parseInt(musicVolume) / 2000, audioContext.currentTime); // Very low volume
+        
+        oscillator.start();
+        
+        // Store reference for cleanup
+        window.backgroundOscillator = { oscillator, gainNode, audioContext };
+    } catch (e) {
+        console.log('Audio context not available:', e);
+    }
+}
 </script>
 """, height=0)
 
 # Main page content
 user = get_current_user()
-st.title("📈 Professional Stock Market Dashboard")
+st.title("📈 Stock Sage - Professional Dashboard")
 if user:
     st.markdown(f"Welcome back, **{user['username']}**! Your comprehensive stock market analysis platform")
 else:
@@ -311,13 +339,12 @@ st.sidebar.markdown("""
 - **Dashboard**: Overview and market data  
 - **Market Overview**: Major indices and sector performance
 - **Stock Search**: Search and analyze individual stocks  
-- **Portfolio**: Track your holdings and performance
+- **Stocks**: Track your holdings and performance
 - **Watchlist**: Monitor stocks of interest
 - **Technical Analysis**: Advanced charting and indicators
 - **News**: Market news and analysis
 
 **Business Management:**
-- **Company Dashboard**: Team and business management
 - **Inventory Management**: Product tracking and operations
 - **Sales Analytics**: Sales reports and performance analysis
 - **Barcode Scanner**: Quick product operations and scanning

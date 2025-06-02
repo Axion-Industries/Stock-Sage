@@ -336,7 +336,7 @@ def main():
 
             # Create proper labels for the pie chart
             customers_df['customer_label'] = customers_df.apply(
-                lambda x: f"{x.get('name', x.get('customer_name', f'Customer {x[\"id\"]}'))}", axis=1
+                lambda x: f"{x.get('name', x.get('customer_name', 'Customer ' + str(x['id'])))}", axis=1
             )
 
             fig = px.pie(
