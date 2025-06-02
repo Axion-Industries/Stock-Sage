@@ -1,4 +1,40 @@
 import streamlit as st
+from auth import get_current_user
+from database import SettingsManager  # Ensure to include the necessary imports
+
+# Assume settings_manager is instantiated correctly
+
+def main():
+    user = get_current_user()
+    
+    # Removed the music settings section
+    st.markdown("### Display Options")
+
+    # Setting the default to dark theme
+    available_themes = ['Dark']  # Only dark is available
+
+    selected_theme = st.selectbox("Select Theme", available_themes)
+    
+    if selected_theme == "Dark":
+        # Apply dark theme changes
+        st.markdown(
+            """
+            <style>
+            body {
+                background-color: #1e1e1e; /* Dark background */
+                color: #ffffff; /* Light text */
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+    if st.button("Apply Theme"):
+        settings_manager.set_user_preference(user['id'], 'theme', 'dark')
+        st.success("Theme applied successfully! Only dark theme is available.")
+
+if __name__ == "__main__":
+    main()import streamlit as st
 import json
 from datetime import datetime
 from auth import init_auth, get_current_user, require_auth

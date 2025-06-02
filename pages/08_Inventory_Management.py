@@ -17,6 +17,30 @@ st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 # Initialize authentication
 init_auth()
 
+def main():
+    # Code related to authentication and other logic can go here
+    pass
+
+if __name__ == "__main__":
+    main()import streamlit as st
+import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
+from datetime import datetime, timedelta
+from auth import init_auth, get_current_user, require_auth
+from database import DatabaseManager
+import json
+
+st.set_page_config(page_title="Inventory Management", page_icon="📦", layout="wide")
+
+# Load custom CSS
+with open('static/css/style.css', 'r') as f:
+    css = f.read()
+st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
+
+# Initialize authentication
+init_auth()
+
 class InventoryManager:
     def __init__(self):
         self.db = DatabaseManager()
