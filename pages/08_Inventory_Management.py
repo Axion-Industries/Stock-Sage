@@ -418,34 +418,34 @@ def main():
                         else:
                             try:
                                 product_data = {
-                                'sku': sku,
-                                'name': name,
-                                'description': description,
-                                'category_id': category_id,
-                                'barcode': barcode,
-                                'cost_price': cost_price,
-                                'selling_price': selling_price,
-                                'current_stock': current_stock,
-                                'minimum_stock': minimum_stock,
-                                'maximum_stock': maximum_stock,
-                                'location': location,
-                                'expiry_date': expiry_date,
-                                'supplier_id': None
-                            }
+                                    'sku': sku,
+                                    'name': name,
+                                    'description': description,
+                                    'category_id': category_id,
+                                    'barcode': barcode,
+                                    'cost_price': cost_price,
+                                    'selling_price': selling_price,
+                                    'current_stock': current_stock,
+                                    'minimum_stock': minimum_stock,
+                                    'maximum_stock': maximum_stock,
+                                    'location': location,
+                                    'expiry_date': expiry_date,
+                                    'supplier_id': None
+                                }
 
-                            product_id = inventory_manager.add_product(product_data)
+                                product_id = inventory_manager.add_product(product_data)
 
-                            # Record initial stock if any
-                            if current_stock > 0:
-                                inventory_manager.update_stock(
-                                    product_id, current_stock, 'initial_stock', 
-                                    notes="Initial stock entry", user_id=user['id']
-                                )
+                                # Record initial stock if any
+                                if current_stock > 0:
+                                    inventory_manager.update_stock(
+                                        product_id, current_stock, 'initial_stock', 
+                                        notes="Initial stock entry", user_id=user['id']
+                                    )
 
-                            st.success(f"Product '{name}' added successfully!")
-                            st.rerun()
-                    except Exception as e:
-                        st.error(f"Error adding product: {str(e)}")
+                                st.success(f"Product '{name}' added successfully!")
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"Error adding product: {str(e)}")
                 else:
                     st.error("Please fill in all required fields (*)")
 
