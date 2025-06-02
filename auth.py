@@ -9,20 +9,44 @@ def init_auth():
     # Initialize session state if not set
     if 'user' not in st.session_state:
         st.session_state.user = None
+    if 'authenticated' not in st.session_state:
         st.session_state.authenticated = False
     
-    # Try to restore from localStorage using query params
-    query_params = st.query_params
-    if 'restore_user' in query_params and not st.session_state.authenticated:
-        try:
-            import json
-            import base64
-            user_data = json.loads(base64.b64decode(query_params['restore_user']).decode())
-            if restore_session_from_storage(user_data):
-                st.query_params.clear()
-                st.rerun()
-        except:
-            pass
+    # Try to restore session from localStorage via JavaScript
+    if not st.session_state.authenticated:
+        import streamlit.components.v1 as components
+        components.html("""
+        <script>
+        const savedSession = localStorage.getItem('stock_dashboard_session');
+        if (savedSession) {
+            try {
+                const sessionData = JSON.parse(savedSession);
+                if (sessionData && sessionData.id) {
+                    // Send session data to Streamlit
+                    const url = new URL(window.location);
+                    url.searchParams.set('restore_user', btoa(savedSession));
+                    window.history.replaceState({}, '', url);
+                    setTimeout(() => window.location.reload(), 100);
+                }
+            } catch (e) {
+                localStorage.removeItem('stock_dashboard_session');
+            }
+        }
+        </script>
+        """, height=0)
+        
+        # Check for restore parameter
+        query_params = st.query_params
+        if 'restore_user' in query_params and not st.session_state.authenticated:
+            try:
+                import json
+                import base64
+                user_data = json.loads(base64.b64decode(query_params['restore_user']).decode())
+                if restore_session_from_storage(user_data):
+                    st.query_params.clear()
+                    st.rerun()
+            except:
+                pass
 
 def login_page():
     """Display login/register page"""
@@ -126,9 +150,12 @@ def logout():
 def require_auth(func):
     """Decorator to require authentication"""
     def wrapper(*args, **kwargs):
-        if not st.session_state.authenticated:
+        # Initialize auth first
+        init_auth()
+        
+        if not st.session_state.get('authenticated', False):
             login_page()
-            return None
+            st.stop()
         return func(*args, **kwargs)
     return wrapper
 

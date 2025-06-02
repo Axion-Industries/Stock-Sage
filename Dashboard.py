@@ -50,6 +50,34 @@ if 'stock_symbols' not in st.session_state:
 if 'watchlist' not in st.session_state:
     st.session_state.watchlist = []
 
+# Apply saved theme
+import streamlit.components.v1 as components
+components.html("""
+<script>
+// Apply saved theme on page load
+const savedTheme = localStorage.getItem('user_theme');
+if (savedTheme) {
+    document.body.className = document.body.className.replace(/theme-\\w+/g, '');
+    
+    if (savedTheme === 'dark') {
+        document.body.classList.add('theme-dark');
+        document.body.style.backgroundColor = '#0E1117';
+        document.body.style.color = '#FAFAFA';
+    } else if (savedTheme === 'dark-green') {
+        document.body.classList.add('theme-dark-green');
+        document.body.style.backgroundColor = '#0F2027';
+        document.body.style.backgroundImage = 'linear-gradient(135deg, #0F2027, #203A43, #2C5364)';
+        document.body.style.color = '#FAFAFA';
+    } else if (savedTheme === 'professional-blue') {
+        document.body.classList.add('theme-professional-blue');
+        document.body.style.backgroundColor = '#1e3a8a';
+        document.body.style.backgroundImage = 'linear-gradient(135deg, #1e3a8a, #3b82f6)';
+        document.body.style.color = 'white';
+    }
+}
+</script>
+""", height=0)
+
 # Main page content
 user = get_current_user()
 st.title("📈 Professional Stock Market Dashboard")

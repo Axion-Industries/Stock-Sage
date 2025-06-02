@@ -7,11 +7,21 @@ from utils.data_fetcher import DataFetcher
 
 st.set_page_config(page_title="Watchlist", page_icon="👁️", layout="wide")
 
+from auth import init_auth, get_current_user, require_auth
+from utils.data_persistence import data_persistence
+
+# Initialize authentication
+init_auth()
+
 # Initialize data fetcher
 if 'data_fetcher' not in st.session_state:
     st.session_state.data_fetcher = DataFetcher()
 
-if 'watchlist' not in st.session_state:
+# Load user's watchlist from database
+user = get_current_user()
+if user and 'watchlist' not in st.session_state:
+    st.session_state.watchlist = data_persistence.get_user_watchlist(user['id'])
+elif 'watchlist' not in st.session_state:
     st.session_state.watchlist = []
 
 if 'price_alerts' not in st.session_state:
@@ -36,6 +46,9 @@ with col2:
             if data_fetcher.validate_symbol(new_symbol):
                 if new_symbol not in st.session_state.watchlist:
                     st.session_state.watchlist.append(new_symbol)
+                    # Save to database if user is logged in
+                    if user:
+                        data_persistence.save_watchlist_item(user['id'], new_symbol)
                     st.success(f"Added {new_symbol} to watchlist!")
                 else:
                     st.warning(f"{new_symbol} is already in your watchlist.")
@@ -128,6 +141,9 @@ if st.session_state.watchlist:
                     st.session_state.watchlist.remove(row['Symbol'])
                     if row['Symbol'] in st.session_state.price_alerts:
                         del st.session_state.price_alerts[row['Symbol']]
+                    # Remove from database if user is logged in
+                    if user:
+                        data_persistence.remove_watchlist_item(user['id'], row['Symbol'])
                     st.rerun()
             
             with col6:

@@ -330,14 +330,12 @@ def main():
                 available_columns.append('category_name')
 
             if not low_stock_df.empty:
-                st.subheader("⚠️ Low Stock Alerts")
-
                 # Check which columns are available
                 available_columns = [col for col in ['sku', 'name', 'current_stock', 'minimum_stock'] if col in low_stock_df.columns]
 
                 if available_columns:
                     # Only select available columns that exist
-                    display_df = low_stock_df[available_columns] if available_columns else low_stock_df
+                    display_df = low_stock_df[available_columns]
                     st.dataframe(
                         display_df,
                         use_container_width=True
@@ -354,10 +352,16 @@ def main():
 
         if expiring_products:
             expiring_df = pd.DataFrame(expiring_products)
-            st.dataframe(
-                expiring_df[['sku', 'name', 'current_stock', 'expiry_date', 'category_name']],
-                use_container_width=True
-            )
+            # Check available columns
+            available_columns = [col for col in ['sku', 'name', 'current_stock', 'expiry_date', 'category_name'] if col in expiring_df.columns]
+            
+            if available_columns:
+                st.dataframe(
+                    expiring_df[available_columns],
+                    use_container_width=True
+                )
+            else:
+                st.dataframe(expiring_df, use_container_width=True)
         else:
             st.success("No products expiring in the next 30 days!")
 
@@ -561,11 +565,19 @@ def main():
 
         if movements:
             movements_df = pd.DataFrame(movements)
-            st.dataframe(
-                movements_df[['created_at', 'sku', 'product_name', 'movement_type', 
-                            'quantity', 'reference_number', 'username']],
-                use_container_width=True
-            )
+            # Check which columns exist and only display available ones
+            available_columns = []
+            for col in ['created_at', 'sku', 'product_name', 'movement_type', 'quantity', 'reference_number', 'username']:
+                if col in movements_df.columns:
+                    available_columns.append(col)
+            
+            if available_columns:
+                st.dataframe(
+                    movements_df[available_columns],
+                    use_container_width=True
+                )
+            else:
+                st.dataframe(movements_df, use_container_width=True)
         else:
             st.info("No stock movements recorded yet.")
 

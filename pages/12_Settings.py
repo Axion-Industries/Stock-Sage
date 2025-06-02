@@ -156,37 +156,58 @@ def main():
                 settings_manager.set_user_preference(user['id'], 'mouse_glow', str(mouse_glow).lower())
                 settings_manager.set_user_preference(user['id'], 'animations', str(animations).lower())
                 
-                # Apply via JavaScript
+                # Apply via JavaScript with proper CSS injection
                 components.html(f"""
                 <script>
-                // Apply theme
-                document.body.className = '';
+                // Remove existing theme classes
+                document.body.className = document.body.className.replace(/theme-\\w+/g, '');
+                
+                // Apply new theme
                 if ('{theme_value}' === 'dark') {{
                     document.body.classList.add('theme-dark');
+                    document.body.style.backgroundColor = '#0E1117';
+                    document.body.style.color = '#FAFAFA';
                 }} else if ('{theme_value}' === 'dark-green') {{
                     document.body.classList.add('theme-dark-green');
+                    document.body.style.backgroundColor = '#0F2027';
+                    document.body.style.backgroundImage = 'linear-gradient(135deg, #0F2027, #203A43, #2C5364)';
+                    document.body.style.color = '#FAFAFA';
                 }} else if ('{theme_value}' === 'professional-blue') {{
-                    document.body.style.background = 'linear-gradient(135deg, #1e3a8a, #3b82f6)';
+                    document.body.classList.add('theme-professional-blue');
+                    document.body.style.backgroundColor = '#1e3a8a';
+                    document.body.style.backgroundImage = 'linear-gradient(135deg, #1e3a8a, #3b82f6)';
                     document.body.style.color = 'white';
+                }} else {{
+                    document.body.style.backgroundColor = '';
+                    document.body.style.backgroundImage = '';
+                    document.body.style.color = '';
                 }}
                 
-                // Apply effects
-                if (window.dashboardEffects) {{
-                    window.dashboardEffects.updateSetting('theme', '{theme_value}');
-                    window.dashboardEffects.updateSetting('gridEffect', {str(grid_effect).lower()});
-                    window.dashboardEffects.updateSetting('mouseGlow', {str(mouse_glow).lower()});
-                    window.dashboardEffects.updateSetting('animations', {str(animations).lower()});
-                }}
+                // Apply to all Streamlit elements
+                const elements = document.querySelectorAll('.stApp, .main, .block-container');
+                elements.forEach(el => {{
+                    if ('{theme_value}' !== 'light') {{
+                        el.style.backgroundColor = 'transparent';
+                    }}
+                }});
                 
                 // Store in localStorage
                 localStorage.setItem('user_theme', '{theme_value}');
                 localStorage.setItem('grid_effect', '{str(grid_effect).lower()}');
                 localStorage.setItem('mouse_glow', '{str(mouse_glow).lower()}');
                 localStorage.setItem('animations', '{str(animations).lower()}');
+                
+                // Force Streamlit to re-render
+                setTimeout(() => {{
+                    const event = new CustomEvent('themeChanged', {{
+                        detail: {{ theme: '{theme_value}' }}
+                    }});
+                    window.dispatchEvent(event);
+                }}, 100);
                 </script>
                 """, height=0)
                 
-                st.success("Theme applied successfully!")
+                st.success("Theme applied successfully! Changes will be visible across all pages.")
         
         with col2:
             st.markdown("### Custom Background")
