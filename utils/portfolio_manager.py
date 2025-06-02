@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 from datetime import datetime, timedelta
 import json
+from utils.data_persistence import data_persistence
 
 class PortfolioManager:
     def __init__(self):
@@ -22,7 +23,7 @@ class PortfolioManager:
     
     def add_transaction(self, symbol, action, shares, price, date=None):
         """
-        Add a transaction to the portfolio
+        Add a transaction to the portfolio with persistent storage
         
         Args:
             symbol (str): Stock symbol
@@ -31,25 +32,22 @@ class PortfolioManager:
             price (float): Price per share
             date (datetime): Transaction date (default: now)
         """
+        from auth import get_current_user
+        user = get_current_user()
+        if not user:
+            return
+            
         if date is None:
             date = datetime.now()
         
-        # Add to transactions
-        transactions = self.get_transactions()
-        transaction = {
-            'date': date.isoformat(),
-            'symbol': symbol.upper(),
-            'action': action,
-            'shares': shares,
-            'price': price,
-            'total': shares * price
-        }
-        transactions.append(transaction)
-        st.session_state[self.transactions_key] = transactions
+        total = shares * price
+        symbol = symbol.upper()
+        
+        # Save transaction to database
+        data_persistence.add_portfolio_transaction(user['id'], symbol, action, shares, price, total)
         
         # Update portfolio holdings
         portfolio = self.get_portfolio()
-        symbol = symbol.upper()
         
         if symbol not in portfolio:
             portfolio[symbol] = {
@@ -83,6 +81,12 @@ class PortfolioManager:
                     del portfolio[symbol]
             else:
                 raise ValueError(f"Cannot sell {shares} shares. Only {portfolio[symbol]['shares']} available.")
+        
+        # Save updated portfolio to database
+        for sym, holding in portfolio.items():
+            data_persistence.save_portfolio_holding(
+                user['id'], sym, holding['shares'], holding['avg_cost'], holding['total_cost']
+            )
         
         st.session_state[self.portfolio_key] = portfolio
     

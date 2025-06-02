@@ -274,8 +274,13 @@ def main():
         
         if low_stock_products:
             low_stock_df = pd.DataFrame(low_stock_products)
+            # Check which columns exist before selecting
+            available_columns = ['sku', 'name', 'current_stock', 'minimum_stock']
+            if 'category_name' in low_stock_df.columns:
+                available_columns.append('category_name')
+            
             st.dataframe(
-                low_stock_df[['sku', 'name', 'current_stock', 'minimum_stock', 'category_name']],
+                low_stock_df[available_columns],
                 use_container_width=True
             )
         else:

@@ -6,11 +6,21 @@ def init_auth():
     if 'db' not in st.session_state:
         st.session_state.db = DatabaseManager()
     
+    # Check for saved login in browser
     if 'user' not in st.session_state:
-        st.session_state.user = None
-    
-    if 'authenticated' not in st.session_state:
-        st.session_state.authenticated = False
+        saved_user = st.query_params.get('saved_session')
+        if saved_user:
+            try:
+                import json
+                user_data = json.loads(saved_user)
+                st.session_state.user = user_data
+                st.session_state.authenticated = True
+            except:
+                st.session_state.user = None
+                st.session_state.authenticated = False
+        else:
+            st.session_state.user = None
+            st.session_state.authenticated = False
 
 def login_page():
     """Display login/register page"""
@@ -37,6 +47,12 @@ def login_page():
                             'login', 
                             'User logged in successfully'
                         )
+                        
+                        # Save login to browser storage
+                        import json
+                        user_json = json.dumps(user)
+                        st.query_params['saved_session'] = user_json
+                        
                         st.success("Login successful!")
                         st.rerun()
                     else:
