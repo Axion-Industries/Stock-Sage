@@ -11,14 +11,45 @@ class PortfolioManager:
         
     def get_portfolio(self):
         """Get current portfolio holdings"""
+        from auth import get_current_user
+        user = get_current_user()
+        if not user:
+            return {}
+            
         if self.portfolio_key not in st.session_state:
-            st.session_state[self.portfolio_key] = {}
+            # Load from database
+            portfolio = {}
+            holdings = data_persistence.get_user_portfolio(user['id'])
+            for holding in holdings:
+                portfolio[holding['symbol']] = {
+                    'shares': holding['shares'],
+                    'avg_cost': holding['avg_cost'],
+                    'total_cost': holding['total_cost']
+                }
+            st.session_state[self.portfolio_key] = portfolio
         return st.session_state[self.portfolio_key]
     
     def get_transactions(self):
         """Get transaction history"""
+        from auth import get_current_user
+        user = get_current_user()
+        if not user:
+            return []
+            
         if self.transactions_key not in st.session_state:
-            st.session_state[self.transactions_key] = []
+            # Load from database
+            transactions = []
+            db_transactions = data_persistence.get_user_transactions(user['id'])
+            for trans in db_transactions:
+                transactions.append({
+                    'symbol': trans['symbol'],
+                    'action': trans['action'],
+                    'shares': trans['shares'],
+                    'price': trans['price'],
+                    'total': trans['total'],
+                    'date': trans['transaction_date']
+                })
+            st.session_state[self.transactions_key] = transactions
         return st.session_state[self.transactions_key]
     
     def add_transaction(self, symbol, action, shares, price, date=None):

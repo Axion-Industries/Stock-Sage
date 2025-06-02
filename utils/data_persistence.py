@@ -2,6 +2,9 @@ import sqlite3
 from database import DatabaseManager
 import json
 
+import sqlite3
+from database import DatabaseManager
+
 class DataPersistence:
     def __init__(self):
         self.db = DatabaseManager()

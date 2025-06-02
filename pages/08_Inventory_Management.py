@@ -489,14 +489,15 @@ def main():
             display_columns = ['sku', 'name', 'category_name', 'current_stock', 'minimum_stock', 
                              'cost_price', 'selling_price', 'location']
 
-            st.dataframe(
-                products_df[display_columns],
-                use_container_width=True,
-                column_config={
-                    "cost_price": st.column_config.NumberColumn("Cost Price", format="$%.2f"),
-                    "selling_price": st.column_config.NumberColumn("Selling Price", format="$%.2f"),
-                }
-            )
+            # Check which columns exist
+            available_columns = [col for col in display_columns if col in products_df.columns]
+            if available_columns:
+                st.dataframe(
+                    products_df[available_columns],
+                    use_container_width=True
+                )
+            else:
+                st.info("No product data available")
         else:
             st.info("No products found matching the criteria.")
 

@@ -6,34 +6,23 @@ def init_auth():
     if 'db' not in st.session_state:
         st.session_state.db = DatabaseManager()
     
-    # Check for saved login in browser localStorage
+    # Initialize session state if not set
     if 'user' not in st.session_state:
-        # Add JavaScript to check localStorage
-        import streamlit.components.v1 as components
-        
-        # Check localStorage for saved session
-        check_session_script = """
-        <script>
-        const savedSession = localStorage.getItem('stock_dashboard_session');
-        if (savedSession) {
-            const sessionData = JSON.parse(savedSession);
-            // Send session data back to Streamlit
-            window.parent.postMessage({
-                type: 'saved_session',
-                data: sessionData
-            }, '*');
-        } else {
-            window.parent.postMessage({
-                type: 'no_session'
-            }, '*');
-        }
-        </script>
-        """
-        components.html(check_session_script, height=0)
-        
-        # Initialize session state
         st.session_state.user = None
         st.session_state.authenticated = False
+    
+    # Try to restore from localStorage using query params
+    query_params = st.query_params
+    if 'restore_user' in query_params and not st.session_state.authenticated:
+        try:
+            import json
+            import base64
+            user_data = json.loads(base64.b64decode(query_params['restore_user']).decode())
+            if restore_session_from_storage(user_data):
+                st.query_params.clear()
+                st.rerun()
+        except:
+            pass
 
 def login_page():
     """Display login/register page"""
@@ -61,13 +50,21 @@ def login_page():
                             'User logged in successfully'
                         )
                         
-                        # Save login to browser localStorage
+                        # Save login state
                         import streamlit.components.v1 as components
                         import json
-                        user_json = json.dumps(user)
+                        import base64
+                        user_data = json.dumps(user)
+                        encoded_data = base64.b64encode(user_data.encode()).decode()
+                        
+                        # Store in browser localStorage and set query param for restoration
                         save_session_script = f"""
                         <script>
-                        localStorage.setItem('stock_dashboard_session', '{user_json}');
+                        localStorage.setItem('stock_dashboard_session', '{user_data}');
+                        // Set query param for session restoration
+                        const url = new URL(window.location);
+                        url.searchParams.set('restore_user', '{encoded_data}');
+                        window.history.replaceState({{}}, '', url);
                         </script>
                         """
                         components.html(save_session_script, height=0)

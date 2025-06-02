@@ -22,49 +22,22 @@ def load_custom_assets():
     with open('static/css/style.css', 'r') as f:
         css = f.read()
     st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
-    
+
     with open('static/js/effects.js', 'r') as f:
         js = f.read()
     components.html(f'<script>{js}</script>', height=0)
 
 load_custom_assets()
 
-# Initialize authentication
+# Initialize authentication first
 init_auth()
-
-# Check for session restoration from localStorage via JavaScript
-import streamlit.components.v1 as components
-
-if not st.session_state.authenticated:
-    # Try to restore session from localStorage
-    session_check_html = """
-    <script>
-    // Check if we have a saved session
-    const savedSession = localStorage.getItem('stock_dashboard_session');
-    if (savedSession) {
-        try {
-            const sessionData = JSON.parse(savedSession);
-            // Send to parent window
-            if (window.parent) {
-                window.parent.postMessage({
-                    type: 'restore_session',
-                    sessionData: sessionData
-                }, '*');
-            }
-        } catch (e) {
-            localStorage.removeItem('stock_dashboard_session');
-        }
-    }
-    </script>
-    """
-    components.html(session_check_html, height=0)
 
 # Check authentication
 if not st.session_state.authenticated:
     login_page()
     st.stop()
 
-# Initialize session state for authenticated users
+# Initialize components after authentication
 if 'data_fetcher' not in st.session_state:
     st.session_state.data_fetcher = DataFetcher()
 
@@ -95,7 +68,7 @@ with col1:
             spy_price = spy_data['Close'].iloc[-1]
             spy_change = spy_data['Close'].iloc[-1] - spy_data['Open'].iloc[-1]
             spy_pct_change = (spy_change / spy_data['Open'].iloc[-1]) * 100
-            
+
             st.metric(
                 label="S&P 500 (SPY)",
                 value=f"${spy_price:.2f}",
@@ -113,7 +86,7 @@ with col2:
             nasdaq_price = nasdaq_data['Close'].iloc[-1]
             nasdaq_change = nasdaq_data['Close'].iloc[-1] - nasdaq_data['Open'].iloc[-1]
             nasdaq_pct_change = (nasdaq_change / nasdaq_data['Open'].iloc[-1]) * 100
-            
+
             st.metric(
                 label="NASDAQ (QQQ)",
                 value=f"${nasdaq_price:.2f}",
@@ -131,7 +104,7 @@ with col3:
             dow_price = dow_data['Close'].iloc[-1]
             dow_change = dow_data['Close'].iloc[-1] - dow_data['Open'].iloc[-1]
             dow_pct_change = (dow_change / dow_data['Open'].iloc[-1]) * 100
-            
+
             st.metric(
                 label="DOW (DIA)",
                 value=f"${dow_price:.2f}",
@@ -148,7 +121,7 @@ with col4:
         if not vix_data.empty:
             vix_price = vix_data['Close'].iloc[-1]
             vix_change = vix_data['Close'].iloc[-1] - vix_data['Open'].iloc[-1]
-            
+
             st.metric(
                 label="VIX",
                 value=f"{vix_price:.2f}",
@@ -173,15 +146,15 @@ with col2:
                 ticker = yf.Ticker(symbol.upper())
                 info = ticker.info
                 hist = ticker.history(period="1d")
-                
+
                 if not hist.empty:
                     current_price = hist['Close'].iloc[-1]
                     open_price = hist['Open'].iloc[-1]
                     change = current_price - open_price
                     pct_change = (change / open_price) * 100
-                    
+
                     st.success(f"**{symbol.upper()}**: ${current_price:.2f} ({pct_change:+.2f}%)")
-                    
+
                     # Additional info if available
                     if 'longName' in info:
                         st.write(f"**Company**: {info['longName']}")
@@ -210,7 +183,7 @@ try:
                 open_price = hist['Open'].iloc[-1]
                 change = current_price - open_price
                 pct_change = (change / open_price) * 100
-                
+
                 stock_data.append({
                     'Symbol': stock,
                     'Price': current_price,
@@ -219,13 +192,13 @@ try:
                 })
         except:
             continue
-    
+
     if stock_data:
         df = pd.DataFrame(stock_data)
         df = df.sort_values('Change %', ascending=False)
-        
+
         col1, col2 = st.columns(2)
-        
+
         with col1:
             st.write("**Top Gainers**")
             top_gainers = df.head(4)
@@ -235,7 +208,7 @@ try:
                     value=f"${row['Price']:.2f}",
                     delta=f"{row['Change %']:.2f}%"
                 )
-        
+
         with col2:
             st.write("**Top Losers**")
             top_losers = df.tail(4)
