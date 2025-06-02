@@ -325,20 +325,22 @@ def main():
             
         # Customer spending analysis
         if customers:
-            # Calculate total spent for each customer (assuming you have sales_transactions table and customer_id)
+            # Calculate total spent for each customer
             with sales_analytics.db.get_connection() as conn:
                 customers_df['total_spent'] = 0  # Initialize total_spent column
                 for index, customer in customers_df.iterrows():
                     cursor = conn.cursor()
                     try:
-                    customer_id = customer.get('id') if isinstance(customer, dict) else customer[0] if hasattr(customer, '__getitem__') else None
-                    if customer_id:
-                        cursor.execute("SELECT SUM(total_amount) FROM sales_transactions WHERE customer_id = ?", (customer_id,))
-                    else:
+                        customer_id = customer.get('id') if isinstance(customer, dict) else customer[0] if hasattr(customer, '__getitem__') else None
+                        if customer_id:
+                            cursor.execute("SELECT SUM(total_amount) FROM sales_transactions WHERE customer_id = ?", (customer_id,))
+                        else:
+                            cursor.execute("SELECT 0")
+                    except (KeyError, IndexError, TypeError):
                         cursor.execute("SELECT 0")
-                except (KeyError, IndexError, TypeError):
-                    cursor.execute("SELECT 0")
-                    total_spent = cursor.fetchone()[0] or 0
+                    
+                    result = cursor.fetchone()
+                    total_spent = result[0] if result and result[0] else 0
                     customers_df.at[index, 'total_spent'] = total_spent
 
             # Create proper labels for the pie chart

@@ -1,201 +1,630 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Stock Market Dashboard</title>
-    <meta name="description" content="Advanced real-time stock market analysis platform with portfolio tracking, technical analysis, and professional-grade features.">
-    <meta name="keywords" content="stocks, trading, portfolio, market analysis, technical analysis, real-time data">
-    <link rel="icon" type="image/png" href="static/favicon.png">
-    
-    <!-- Open Graph meta tags -->
-    <meta property="og:title" content="Professional Stock Market Dashboard">
-    <meta property="og:description" content="Advanced real-time stock market analysis platform">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://yourapp.render.com">
-    
-    <!-- CSS -->
-    <link rel="stylesheet" href="static/css/style.css">
-    
+    <title>Stock Sage - Professional Stock Market Dashboard</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        * {
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #6366f1 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            overflow-x: hidden;
         }
-        
-        .landing-container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 600px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .logo {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-        
-        h1 {
-            color: #1e3a8a;
-            margin-bottom: 1rem;
-            font-size: 2.5rem;
-            font-weight: 700;
-        }
-        
-        .subtitle {
-            color: #64748b;
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-        
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        
-        .feature {
-            padding: 1.5rem;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-        
-        .feature:hover {
-            transform: translateY(-5px);
-        }
-        
-        .feature-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .cta-button {
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-            color: white;
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
             padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
             border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
-            margin-top: 1rem;
         }
-        
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
-        
-        .stats {
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-go {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-go:hover {
+            background: #059669;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
             display: flex;
-            justify-content: space-around;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid #e2e8f0;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 80px;
         }
-        
+
+        .hero-content {
+            max-width: 800px;
+            color: white;
+        }
+
+        .hero-icon {
+            font-size: 6rem;
+            margin-bottom: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #ffffff, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+        }
+
+        /* Stats Section */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
         .stat {
             text-align: center;
+            color: white;
         }
-        
+
         .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        /* Music Controls */
+        .music-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            z-index: 1000;
+        }
+
+        .music-controls button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        .volume-slider {
+            width: 80px;
+            margin-left: 0.5rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal h2 {
+            margin-bottom: 1rem;
             color: #1e3a8a;
         }
-        
-        .stat-label {
-            color: #64748b;
-            font-size: 0.9rem;
+
+        .modal input {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .modal .btn {
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .auth-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="landing-container">
-        <div class="logo">📈</div>
-        <h1>Professional Stock Market Dashboard</h1>
-        <p class="subtitle">
-            Advanced real-time market analysis with professional-grade features, 
-            portfolio tracking, and comprehensive technical analysis tools.
-        </p>
-        
-        <div class="features">
-            <div class="feature">
-                <div class="feature-icon">📊</div>
-                <h3>Real-Time Data</h3>
-                <p>Live market data from thousands of stocks worldwide</p>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">📈 Stock Sage</div>
+        <div class="auth-buttons">
+            <div id="logged-out-buttons">
+                <button class="btn btn-outline" onclick="showLogin()">Sign In</button>
+                <button class="btn btn-primary" onclick="showRegister()">Register</button>
             </div>
-            <div class="feature">
-                <div class="feature-icon">💼</div>
-                <h3>Portfolio Tracking</h3>
-                <p>Professional portfolio management and performance analytics</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">📈</div>
-                <h3>Technical Analysis</h3>
-                <p>Advanced charting with 20+ technical indicators</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">👁️</div>
-                <h3>Smart Watchlists</h3>
-                <p>Monitor stocks with customizable price alerts</p>
+            <div id="logged-in-buttons" class="hidden">
+                <a href="/Dashboard.py" class="btn btn-go">Go to Dashboard</a>
+                <button class="btn btn-outline" onclick="logout()">Logout</button>
             </div>
         </div>
-        
-        <a href="/app" class="cta-button">Launch Dashboard</a>
-        
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-number">60K+</div>
-                <div class="stat-label">Global Stocks</div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-icon">📈</div>
+            <h1>Stock Sage</h1>
+            <p>Professional stock market analysis platform with real-time data, advanced charting, portfolio management, and comprehensive business tools. Your complete solution for market intelligence and trading insights.</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Real-Time Market Data</h3>
+                    <p>Live stock prices, market indices, and comprehensive financial data from global markets</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💼</div>
+                    <h3>Portfolio Management</h3>
+                    <p>Track your investments, analyze performance, and optimize your trading strategy</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>Technical Analysis</h3>
+                    <p>Advanced charting tools with 20+ technical indicators for professional trading</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">👁️</div>
+                    <h3>Smart Watchlists</h3>
+                    <p>Monitor your favorite stocks with customizable alerts and notifications</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <h3>Business Management</h3>
+                    <p>Inventory tracking, sales analytics, and comprehensive business tools</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Market Intelligence</h3>
+                    <p>News, analysis, and insights to make informed investment decisions</p>
+                </div>
             </div>
-            <div class="stat">
-                <div class="stat-number">Real-Time</div>
-                <div class="stat-label">Market Data</div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">10,000+</div>
+                    <div class="stat-label">Global Stocks</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">Real-Time</div>
+                    <div class="stat-label">Market Data</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">20+</div>
+                    <div class="stat-label">Technical Indicators</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Market Monitoring</div>
+                </div>
             </div>
-            <div class="stat">
-                <div class="stat-number">20+</div>
-                <div class="stat-label">Indicators</div>
-            </div>
+        </div>
+    </section>
+
+    <!-- Music Controls -->
+    <div class="music-controls">
+        <button id="playBtn" onclick="toggleMusic()">🎵</button>
+        <button onclick="previousTrack()">⏮️</button>
+        <button onclick="nextTrack()">⏭️</button>
+        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="30" onchange="setVolume(this.value)">
+        <span id="trackInfo">Lofi Hip Hop</span>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2>Sign In to Stock Sage</h2>
+            <input type="text" id="loginUsername" placeholder="Username or Email">
+            <input type="password" id="loginPassword" placeholder="Password">
+            <button class="btn btn-primary" onclick="login()">Sign In</button>
+            <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+            <p style="margin-top: 1rem; color: #6b7280;">Don't have an account? <a href="#" onclick="showRegister()" style="color: #3b82f6;">Register here</a></p>
         </div>
     </div>
-    
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <h2>Create Account</h2>
+            <input type="text" id="registerUsername" placeholder="Username">
+            <input type="email" id="registerEmail" placeholder="Email">
+            <input type="password" id="registerPassword" placeholder="Password">
+            <input type="password" id="confirmPassword" placeholder="Confirm Password">
+            <button class="btn btn-primary" onclick="register()">Create Account</button>
+            <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+            <p style="margin-top: 1rem; color: #6b7280;">Already have an account? <a href="#" onclick="showLogin()" style="color: #3b82f6;">Sign in here</a></p>
+        </div>
+    </div>
+
+    <!-- Background Audio -->
+    <audio id="backgroundMusic" loop>
+        <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
+        <!-- Fallback to a lofi hip hop stream -->
+    </audio>
+
     <script>
-        // Add some interactive effects
+        // Audio Management
+        let isPlaying = false;
+        let currentTrack = 0;
+        const audio = document.getElementById('backgroundMusic');
+        
+        // Lofi tracks (using YouTube Audio Library and royalty-free sources)
+        const tracks = [
+            {
+                name: "Lofi Study Beats",
+                url: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" // Placeholder - you'd want actual lofi tracks
+            },
+            {
+                name: "Chill Vibes",
+                url: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+            }
+        ];
+
+        function toggleMusic() {
+            const playBtn = document.getElementById('playBtn');
+            if (isPlaying) {
+                audio.pause();
+                playBtn.textContent = '🎵';
+                isPlaying = false;
+            } else {
+                // Create a more pleasant lofi-style tone instead of harsh buzzing
+                if (!window.audioContext) {
+                    initAudioContext();
+                }
+                playBtn.textContent = '⏸️';
+                isPlaying = true;
+            }
+        }
+
+        function initAudioContext() {
+            try {
+                window.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create a more pleasant ambient sound
+                const oscillator1 = audioContext.createOscillator();
+                const oscillator2 = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                const filterNode = audioContext.createBiquadFilter();
+                
+                // Set up a warm, ambient sound
+                oscillator1.frequency.setValueAtTime(110, audioContext.currentTime); // Low A
+                oscillator2.frequency.setValueAtTime(165, audioContext.currentTime); // E above
+                
+                oscillator1.type = 'sine';
+                oscillator2.type = 'triangle';
+                
+                // Connect nodes
+                oscillator1.connect(filterNode);
+                oscillator2.connect(filterNode);
+                filterNode.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Configure filter for warmth
+                filterNode.type = 'lowpass';
+                filterNode.frequency.setValueAtTime(800, audioContext.currentTime);
+                
+                // Set very low volume
+                gainNode.gain.setValueAtTime(0.02, audioContext.currentTime);
+                
+                oscillator1.start();
+                oscillator2.start();
+                
+                // Add subtle vibrato
+                const lfo = audioContext.createOscillator();
+                const lfoGain = audioContext.createGain();
+                lfo.frequency.setValueAtTime(2, audioContext.currentTime);
+                lfoGain.gain.setValueAtTime(2, audioContext.currentTime);
+                lfo.connect(lfoGain);
+                lfoGain.connect(oscillator1.frequency);
+                lfo.start();
+                
+                window.backgroundOscillators = { oscillator1, oscillator2, gainNode, lfo };
+            } catch (e) {
+                console.log('Audio context not available');
+            }
+        }
+
+        function setVolume(value) {
+            if (window.backgroundOscillators) {
+                window.backgroundOscillators.gainNode.gain.setValueAtTime(value / 5000, window.audioContext.currentTime);
+            }
+        }
+
+        function previousTrack() {
+            currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
+            updateTrackInfo();
+        }
+
+        function nextTrack() {
+            currentTrack = (currentTrack + 1) % tracks.length;
+            updateTrackInfo();
+        }
+
+        function updateTrackInfo() {
+            document.getElementById('trackInfo').textContent = tracks[currentTrack].name;
+        }
+
+        // Authentication Management
+        function showLogin() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+
+        function showRegister() {
+            document.getElementById('registerModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('registerModal').style.display = 'none';
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (username && password) {
+                // Simulate login success
+                localStorage.setItem('stock_dashboard_session', JSON.stringify({
+                    id: Date.now(),
+                    username: username,
+                    email: username.includes('@') ? username : username + '@example.com'
+                }));
+                
+                showLoggedInState();
+                closeModal();
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+
+        function register() {
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (username && email && password && confirmPassword) {
+                if (password === confirmPassword) {
+                    // Simulate registration success
+                    localStorage.setItem('stock_dashboard_session', JSON.stringify({
+                        id: Date.now(),
+                        username: username,
+                        email: email
+                    }));
+                    
+                    showLoggedInState();
+                    closeModal();
+                } else {
+                    alert('Passwords do not match');
+                }
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('stock_dashboard_session');
+            showLoggedOutState();
+        }
+
+        function showLoggedInState() {
+            document.getElementById('logged-out-buttons').classList.add('hidden');
+            document.getElementById('logged-in-buttons').classList.remove('hidden');
+        }
+
+        function showLoggedOutState() {
+            document.getElementById('logged-out-buttons').classList.remove('hidden');
+            document.getElementById('logged-in-buttons').classList.add('hidden');
+        }
+
+        // Check for existing session on page load
+        window.addEventListener('load', function() {
+            const savedSession = localStorage.getItem('stock_dashboard_session');
+            if (savedSession) {
+                showLoggedInState();
+            }
+            
+            // Initialize track info
+            updateTrackInfo();
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            const loginModal = document.getElementById('loginModal');
+            const registerModal = document.getElementById('registerModal');
+            
+            if (event.target === loginModal) {
+                closeModal();
+            }
+            if (event.target === registerModal) {
+                closeModal();
+            }
+        });
+
+        // Add some background animation
         document.addEventListener('mousemove', (e) => {
-            const container = document.querySelector('.landing-container');
-            const rect = container.getBoundingClientRect();
+            const hero = document.querySelector('.hero');
+            const rect = hero.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
             
-            const rotateX = (y - centerY) / 20;
-            const rotateY = (centerX - x) / 20;
+            const rotateX = (y - centerY) / 50;
+            const rotateY = (centerX - x) / 50;
             
-            container.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        });
-        
-        document.addEventListener('mouseleave', () => {
-            const container = document.querySelector('.landing-container');
-            container.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+            hero.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
         });
     </script>
 </body>

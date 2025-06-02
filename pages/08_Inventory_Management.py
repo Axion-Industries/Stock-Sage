@@ -405,15 +405,17 @@ def main():
 
             if st.button("Add Product"):
                 if sku and name and cost_price and selling_price:
-                    # Check if SKU already exists
-                    with inventory_manager.db.get_connection() as conn:
-                        cursor = conn.cursor()
-                        cursor.execute("SELECT COUNT(*) as count FROM products WHERE sku = ?", (sku,))
-                        existing_sku = cursor.fetchone()['count']
-                    
-                    if existing_sku > 0:
-                        st.error(f"SKU '{sku}' already exists. Please use a unique SKU.")
-                    else:
+                    try:
+                        # Check if SKU already exists
+                        with inventory_manager.db.get_connection() as conn:
+                            cursor = conn.cursor()
+                            cursor.execute("SELECT COUNT(*) as count FROM products WHERE sku = ?", (sku,))
+                            result = cursor.fetchone()
+                            existing_sku = result['count'] if result else 0
+                        
+                        if existing_sku > 0:
+                            st.error(f"SKU '{sku}' already exists. Please use a unique SKU.")
+                        else:
                         try:
                             product_data = {
                                 'sku': sku,
@@ -442,8 +444,8 @@ def main():
 
                             st.success(f"Product '{name}' added successfully!")
                             st.rerun()
-                        except Exception as e:
-                            st.error(f"Error adding product: {str(e)}")
+                    except Exception as e:
+                        st.error(f"Error adding product: {str(e)}")
                 else:
                     st.error("Please fill in all required fields (*)")
 

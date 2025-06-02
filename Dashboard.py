@@ -81,24 +81,39 @@ const musicEnabled = localStorage.getItem('music_enabled');
 const musicVolume = localStorage.getItem('music_volume') || '30';
 
 if (musicEnabled === 'true' && !document.getElementById('background-music')) {
-    // Create a subtle ambient background sound for demo
+    // Create a pleasant ambient soundscape instead of buzzing
     try {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
+        const oscillator1 = audioContext.createOscillator();
+        const oscillator2 = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
+        const filterNode = audioContext.createBiquadFilter();
         
-        oscillator.connect(gainNode);
+        // Create pleasant harmonic tones
+        oscillator1.frequency.setValueAtTime(220, audioContext.currentTime); // A3
+        oscillator2.frequency.setValueAtTime(330, audioContext.currentTime); // E4
+        
+        oscillator1.type = 'sine';
+        oscillator2.type = 'triangle';
+        
+        // Connect with filter for warmth
+        oscillator1.connect(filterNode);
+        oscillator2.connect(filterNode);
+        filterNode.connect(gainNode);
         gainNode.connect(audioContext.destination);
         
-        // Create a very subtle low-frequency ambient tone
-        oscillator.frequency.setValueAtTime(55, audioContext.currentTime); // Low A note
-        oscillator.type = 'sine';
-        gainNode.gain.setValueAtTime(parseInt(musicVolume) / 2000, audioContext.currentTime); // Very low volume
+        // Configure low-pass filter
+        filterNode.type = 'lowpass';
+        filterNode.frequency.setValueAtTime(1000, audioContext.currentTime);
         
-        oscillator.start();
+        // Very subtle volume
+        gainNode.gain.setValueAtTime(parseInt(musicVolume) / 10000, audioContext.currentTime);
+        
+        oscillator1.start();
+        oscillator2.start();
         
         // Store reference for cleanup
-        window.backgroundOscillator = { oscillator, gainNode, audioContext };
+        window.backgroundOscillator = { oscillator1, oscillator2, gainNode, audioContext, filterNode };
     } catch (e) {
         console.log('Audio context not available:', e);
     }
