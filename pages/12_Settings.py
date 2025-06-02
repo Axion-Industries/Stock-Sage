@@ -1,40 +1,4 @@
 import streamlit as st
-from auth import get_current_user
-from database import SettingsManager  # Ensure to include the necessary imports
-
-# Assume settings_manager is instantiated correctly
-
-def main():
-    user = get_current_user()
-    
-    # Removed the music settings section
-    st.markdown("### Display Options")
-
-    # Setting the default to dark theme
-    available_themes = ['Dark']  # Only dark is available
-
-    selected_theme = st.selectbox("Select Theme", available_themes)
-    
-    if selected_theme == "Dark":
-        # Apply dark theme changes
-        st.markdown(
-            """
-            <style>
-            body {
-                background-color: #1e1e1e; /* Dark background */
-                color: #ffffff; /* Light text */
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
-
-    if st.button("Apply Theme"):
-        settings_manager.set_user_preference(user['id'], 'theme', 'dark')
-        st.success("Theme applied successfully! Only dark theme is available.")
-
-if __name__ == "__main__":
-    main()import streamlit as st
 import json
 from datetime import datetime
 from auth import init_auth, get_current_user, require_auth
@@ -134,290 +98,30 @@ def main():
     st.title("⚙️ Settings & Preferences")
     st.markdown("**Customize your experience and manage your account**")
 
+    # Apply dark theme permanently
+    components.html("""
+    <script>
+    // Apply dark theme permanently
+    document.body.style.backgroundColor = '#0E1117';
+    document.body.style.color = '#FAFAFA';
+
+    // Apply to all Streamlit elements
+    const elements = document.querySelectorAll('.stApp, .main, .block-container');
+    elements.forEach(el => {
+        el.style.backgroundColor = 'transparent';
+    });
+
+    // Store in localStorage
+    localStorage.setItem('user_theme', 'dark');
+    </script>
+    """, height=0)
+
     # Settings navigation
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "🎨 Appearance", "🔔 Notifications", "👤 Account", "🔐 Security", "📊 Data", "🔧 Advanced"
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "🔔 Notifications", "👤 Account", "🔐 Security", "📊 Data", "🔧 Advanced"
     ])
 
     with tab1:
-        # Appearance Settings
-        st.subheader("Appearance & Theme")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.markdown("### Theme Selection")
-
-            current_theme = settings_manager.get_user_preference(user['id'], 'theme', 'light')
-
-            theme_options = {
-                "Light": "light",
-                "Dark": "dark",
-                "Dark Green": "dark-green",
-                "Professional Blue": "professional-blue",
-                "Custom": "custom"
-            }
-
-            selected_theme = st.selectbox(
-                "Choose Theme",
-                options=list(theme_options.keys()),
-                index=list(theme_options.values()).index(current_theme) if current_theme in theme_options.values() else 0
-            )
-
-            # Visual Effects
-            st.markdown("### Visual Effects")
-
-            grid_effect = st.toggle(
-                "Grid Background Animation",
-                value=settings_manager.get_user_preference(user['id'], 'grid_effect', 'true') == 'true'
-            )
-
-            mouse_glow = st.toggle(
-                "Mouse Glow Effect",
-                value=settings_manager.get_user_preference(user['id'], 'mouse_glow', 'true') == 'true'
-            )
-
-            animations = st.toggle(
-                "UI Animations",
-                value=settings_manager.get_user_preference(user['id'], 'animations', 'true') == 'true'
-            )
-
-            # Apply theme button
-            if st.button("Apply Theme Changes", type="primary"):
-                theme_value = theme_options[selected_theme]
-
-                # Save preferences
-                settings_manager.set_user_preference(user['id'], 'theme', theme_value)
-                settings_manager.set_user_preference(user['id'], 'grid_effect', str(grid_effect).lower())
-                settings_manager.set_user_preference(user['id'], 'mouse_glow', str(mouse_glow).lower())
-                settings_manager.set_user_preference(user['id'], 'animations', str(animations).lower())
-
-                # Apply via JavaScript with proper CSS injection
-                components.html(f"""
-                <script>
-                // Remove existing theme classes
-                document.body.className = document.body.className.replace(/theme-\\w+/g, '');
-
-                // Apply new theme
-                if ('{theme_value}' === 'dark') {{
-                    document.body.classList.add('theme-dark');
-                    document.body.style.backgroundColor = '#0E1117';
-                    document.body.style.color = '#FAFAFA';
-                }} else if ('{theme_value}' === 'dark-green') {{
-                    document.body.classList.add('theme-dark-green');
-                    document.body.style.backgroundColor = '#0F2027';
-                    document.body.style.backgroundImage = 'linear-gradient(135deg, #0F2027, #203A43, #2C5364)';
-                    document.body.style.color = '#FAFAFA';
-                }} else if ('{theme_value}' === 'professional-blue') {{
-                    document.body.classList.add('theme-professional-blue');
-                    document.body.style.backgroundColor = '#1e3a8a';
-                    document.body.style.backgroundImage = 'linear-gradient(135deg, #1e3a8a, #3b82f6)';
-                    document.body.style.color = 'white';
-                }} else {{
-                    document.body.style.backgroundColor = '';
-                    document.body.style.backgroundImage = '';
-                    document.body.style.color = '';
-                }}
-
-                // Apply to all Streamlit elements
-                const elements = document.querySelectorAll('.stApp, .main, .block-container');
-                elements.forEach(el => {{
-                    if ('{theme_value}' !== 'light') {{
-                        el.style.backgroundColor = 'transparent';
-                    }}
-                }});
-
-                // Store in localStorage
-                localStorage.setItem('user_theme', '{theme_value}');
-                localStorage.setItem('grid_effect', '{str(grid_effect).lower()}');
-                localStorage.setItem('mouse_glow', '{str(mouse_glow).lower()}');
-                localStorage.setItem('animations', '{str(animations).lower()}');
-
-                // Force Streamlit to re-render
-                setTimeout(() => {{
-                    const event = new CustomEvent('themeChanged', {{
-                        detail: {{ theme: '{theme_value}' }}
-                    }});
-                    window.dispatchEvent(event);
-                }}, 100);
-                </script>
-                """, height=0)
-
-                st.success("Theme applied successfully! Changes will be visible across all pages.")
-
-        with col2:
-            st.markdown("### Custom Background")
-
-            if selected_theme == "Custom":
-                uploaded_bg = st.file_uploader(
-                    "Upload Background Image",
-                    type=['png', 'jpg', 'jpeg', 'gif'],
-                    help="Upload a custom background image for your dashboard"
-                )
-
-                if uploaded_bg:
-                    # Convert to base64 and apply
-                    import base64
-                    bg_data = base64.b64encode(uploaded_bg.read()).decode()
-                    bg_url = f"data:image/{uploaded_bg.type.split('/')[1]};base64,{bg_data}"
-
-                    components.html(f"""
-                    <script>
-                    document.body.style.backgroundImage = 'url({bg_url})';
-                    document.body.style.backgroundSize = 'cover';
-                    document.body.style.backgroundAttachment = 'fixed';
-                    localStorage.setItem('custom_background', '{bg_url}');
-                    </script>
-                    """, height=0)
-
-                    st.success("Custom background applied!")
-
-            st.markdown("### Display Options")
-
-            sidebar_collapsed = st.toggle(
-                "Collapsed Sidebar by Default",
-                value=settings_manager.get_user_preference(user['id'], 'sidebar_collapsed', 'false') == 'true'
-            )
-
-            wide_mode = st.toggle(
-                "Wide Layout Mode",
-                value=settings_manager.get_user_preference(user['id'], 'wide_mode', 'true') == 'true'
-            )
-
-            if st.button("Save Display Settings"):
-                settings_manager.set_user_preference(user['id'], 'sidebar_collapsed', str(sidebar_collapsed).lower())
-                settings_manager.set_user_preference(user['id'], 'wide_mode', str(wide_mode).lower())
-                st.success("Display settings saved!")
-
-            st.markdown("### Music & Audio")
-
-            music_enabled = st.toggle(
-                "Background Music",
-                value=settings_manager.get_user_preference(user['id'], 'music_enabled', 'true') == 'true',
-                help="Play relaxing lofi music in the background"
-            )
-
-            if music_enabled:
-                music_volume = st.slider(
-                    "Music Volume",
-                    min_value=0,
-                    max_value=100,
-                    value=int(settings_manager.get_user_preference(user['id'], 'music_volume', '30')),
-                    help="Adjust background music volume"
-                )
-
-                music_playlist = st.selectbox(
-                    "Music Playlist",
-                    [
-                        "Lofi Hip Hop Study Mix (6 hours)",
-                        "Chill Jazz Lofi (4 hours)", 
-                        "Ambient Study Music (5 hours)",
-                        "Peaceful Piano Lofi (3 hours)"
-                    ],
-                    index=0
-                )
-
-                if st.button("Apply Music Settings"):
-                    settings_manager.set_user_preference(user['id'], 'music_enabled', str(music_enabled).lower())
-                    settings_manager.set_user_preference(user['id'], 'music_volume', str(music_volume))
-                    settings_manager.set_user_preference(user['id'], 'music_playlist', music_playlist)
-
-                    # Apply music with JavaScript
-                    playlist_urls = {
-                        "Lofi Hip Hop Study Mix (6 hours)": "https://www.youtube.com/watch?v=jfKfPfyJRdk",
-                        "Chill Jazz Lofi (4 hours)": "https://www.youtube.com/watch?v=rUxyKA_-grg", 
-                        "Ambient Study Music (5 hours)": "https://www.youtube.com/watch?v=M5QY2_8704o",
-                        "Peaceful Piano Lofi (3 hours)": "https://www.youtube.com/watch?v=DWcJFNfaw9c"
-                    }
-
-                    selected_url = playlist_urls.get(music_playlist, playlist_urls["Lofi Hip Hop Study Mix (6 hours)"])
-
-                    components.html(f"""
-                    <script>
-                    // Remove existing audio
-                    const existingAudio = document.getElementById('background-music');
-                    if (existingAudio) {{
-                        existingAudio.remove();
-                    }}
-
-                    if ({str(music_enabled).lower()}) {{
-                        // Create audio element for lofi music
-                        const audio = document.createElement('audio');
-                        audio.id = 'background-music';
-                        audio.loop = true;
-                        audio.volume = {music_volume / 100};
-                        audio.autoplay = true;
-
-                        // Use a direct lofi music stream (YouTube streams require different handling)
-                        // For now, using a placeholder - in production you'd use actual music files
-                        const musicSources = {{
-                            "Lofi Hip Hop Study Mix (6 hours)": "https://www.soundjay.com/misc/sounds/clock-ticking-4.wav",
-                            "Chill Jazz Lofi (4 hours)": "https://www.soundjay.com/misc/sounds/clock-ticking-4.wav",
-                            "Ambient Study Music (5 hours)": "https://www.soundjay.com/misc/sounds/clock-ticking-4.wav",
-                            "Peaceful Piano Lofi (3 hours)": "https://www.soundjay.com/misc/sounds/clock-ticking-4.wav"
-                        }};
-
-                        audio.src = musicSources["{music_playlist}"] || musicSources["Lofi Hip Hop Study Mix (6 hours)"];
-
-                        audio.addEventListener('error', function() {{
-                            console.log('Music failed to load, using alternative');
-                            // Fallback to a simple tone generator for demo
-                            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                            const oscillator = audioContext.createOscillator();
-                            const gainNode = audioContext.createGain();
-
-                            oscillator.connect(gainNode);
-                            gainNode.connect(audioContext.destination);
-
-                            oscillator.frequency.setValueAtTime(220, audioContext.currentTime); // A3 note
-                            gainNode.gain.setValueAtTime({music_volume / 1000}, audioContext.currentTime); // Very low volume
-
-                            oscillator.start();
-
-                            // Store reference for cleanup
-                            window.backgroundOscillator = {{ oscillator, gainNode, audioContext }};
-                        }});
-
-                        document.body.appendChild(audio);
-
-                        // Store settings
-                        localStorage.setItem('music_enabled', '{str(music_enabled).lower()}');
-                        localStorage.setItem('music_volume', '{music_volume}');
-                        localStorage.setItem('music_playlist', '{music_playlist}');
-
-                        // Try to play
-                        audio.play().catch(e => console.log('Autoplay prevented:', e));
-                    }} else {{
-                        // Stop any background music
-                        if (window.backgroundOscillator) {{
-                            window.backgroundOscillator.oscillator.stop();
-                            window.backgroundOscillator = null;
-                        }}
-                        localStorage.setItem('music_enabled', 'false');
-                    }}
-                    </script>
-                    """, height=0)
-
-                    st.success("Music settings applied!")
-
-            if not music_enabled and st.button("Apply Music Settings"):
-                settings_manager.set_user_preference(user['id'], 'music_enabled', 'false')
-                components.html("""
-                <script>
-                const existingAudio = document.getElementById('background-music');
-                if (existingAudio) {
-                    existingAudio.remove();
-                }
-                if (window.backgroundOscillator) {
-                    window.backgroundOscillator.oscillator.stop();
-                    window.backgroundOscillator = null;
-                }
-                localStorage.setItem('music_enabled', 'false');
-                </script>
-                """, height=0)
-                st.success("Background music disabled!")
-
-    with tab2:
         # Notifications Settings
         st.subheader("Notification Preferences")
 
@@ -441,16 +145,10 @@ def main():
                 value=settings_manager.get_user_preference(user['id'], 'stock_alerts', 'true') == 'true'
             )
 
-            inventory_alerts = st.toggle(
-                "Inventory Alerts",
-                value=settings_manager.get_user_preference(user['id'], 'inventory_alerts', 'true') == 'true'
-            )
-
             if st.button("Save Notification Settings"):
                 settings_manager.set_user_preference(user['id'], 'email_notifications', str(email_notifications).lower())
                 settings_manager.set_user_preference(user['id'], 'push_notifications', str(push_notifications).lower())
                 settings_manager.set_user_preference(user['id'], 'stock_alerts', str(stock_alerts).lower())
-                settings_manager.set_user_preference(user['id'], 'inventory_alerts', str(inventory_alerts).lower())
                 st.success("Notification settings saved!")
 
         with col2:
@@ -474,7 +172,7 @@ def main():
             else:
                 st.info("No notifications yet")
 
-    with tab3:
+    with tab2:
         # Account Settings
         st.subheader("Account Information")
 
@@ -532,7 +230,7 @@ def main():
                     last_login = datetime.fromisoformat(user_data['last_login'])
                     st.metric("Last Login", last_login.strftime("%Y-%m-%d %H:%M"))
 
-    with tab4:
+    with tab3:
         # Security Settings
         st.subheader("Security & Privacy")
 
@@ -593,7 +291,7 @@ def main():
                 settings_manager.set_user_preference(user['id'], 'login_notifications', str(login_notifications).lower())
                 st.success("Security settings saved!")
 
-    with tab5:
+    with tab4:
         # Data Management
         st.subheader("Data Management")
 
@@ -647,7 +345,7 @@ def main():
                 except Exception as e:
                     st.error(f"Invalid portfolio file: {str(e)}")
 
-    with tab6:
+    with tab5:
         # Advanced Settings
         st.subheader("Advanced Configuration")
 
@@ -701,6 +399,9 @@ def main():
 
             if st.button("Delete Account", type="secondary"):
                 st.error("Account deletion requires administrator approval. Contact support.")
+
+    # Display current theme info
+    st.info("💡 Dark theme is permanently enabled for the best user experience.")
 
 if __name__ == "__main__":
     main()
