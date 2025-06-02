@@ -280,7 +280,7 @@ if st.sidebar.button("Apply Theme"):
 st.sidebar.markdown("## 🚀 Navigation")
 st.sidebar.markdown("""
 **Stock Market Analysis:**
-- **Main**: Dashboard overview and market data
+- **Dashboard**: Overview and market data  
 - **Market Overview**: Major indices and sector performance
 - **Stock Search**: Search and analyze individual stocks  
 - **Portfolio**: Track your holdings and performance
@@ -289,10 +289,11 @@ st.sidebar.markdown("""
 - **News**: Market news and analysis
 
 **Business Management:**
-- **Admin Dashboard**: System administration and user management
-- **Inventory Management**: Stock tracking and product management
+- **Company Dashboard**: Team and business management
+- **Inventory Management**: Product tracking and operations
 - **Sales Analytics**: Sales reports and performance analysis
 - **Barcode Scanner**: Quick product operations and scanning
+- **Settings**: Customize your experience and preferences
 """)
 
 # User Account
